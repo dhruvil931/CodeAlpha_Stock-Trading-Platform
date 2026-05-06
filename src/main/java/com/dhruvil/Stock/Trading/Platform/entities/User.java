@@ -1,8 +1,13 @@
 package com.dhruvil.Stock.Trading.Platform.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -10,7 +15,7 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -19,4 +24,14 @@ public class User {
     private String password;
 
     private String role;
+
+    private BigDecimal balance;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Portfolio> portfolios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Transaction> transactions = new ArrayList<>();
 }
