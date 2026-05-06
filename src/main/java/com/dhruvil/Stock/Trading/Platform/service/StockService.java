@@ -76,4 +76,49 @@ public class StockService {
 
         return "Stock purchased successfully";
     }
+
+    @Transactional
+    public String sellStock(String username, BuyStockRequestDto req) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Stock stock = stockRepository.findById(req.getStockId())
+                .orElseThrow(() -> new RuntimeException("Stock not found"));
+
+        Portfolio portfolio = portfolioRepository
+                .findByUserAndStock(user, stock)
+                .orElseThrow(() -> new RuntimeException("Stock not owned"));
+
+        if(portfolio.getQuantity() < req.getQuantity()) {
+            throw new RuntimeException("Insufficient owned quantity");
+        }
+
+        BigDecimal totalPrice = stock.getPrice().multiply(BigDecimal.valueOf(req.getQuantity()));
+
+        user.setBalance(user.getBalance().add(totalPrice));
+
+        portfolio.setQuantity(portfolio.getQuantity() - req.getQuantity());
+
+        stock.setQuantity(stock.getQuantity() + req.getQuantity());
+
+        if(portfolio.getQuantity() == 0) {
+            portfolioRepository.delete(portfolio);
+        }
+        else {
+            portfolioRepository.save(portfolio);
+        }
+
+        Transaction transaction = new Transaction();
+
+        transaction.setUser(user);
+        transaction.setStock(stock);
+        transaction.setQuantity(req.getQuantity());
+        transaction.setPrice(stock.getPrice());
+        transaction.setType("SELL");
+        transaction.setTimestamp(LocalDateTime.now());
+
+        transactionRepository.save(transaction);
+
+        return "Stock sold successfully";
+    }
 }

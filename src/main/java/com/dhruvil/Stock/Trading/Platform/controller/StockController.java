@@ -27,4 +27,11 @@ public class StockController {
 
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/sell")
+    public ResponseEntity<?> sellStock(@RequestBody BuyStockRequestDto buyStockRequestDto, Principal principal) {
+        String result = stockService.sellStock(principal.getName(), buyStockRequestDto);
+
+        return ResponseEntity.ok(result);
+    }
 }
