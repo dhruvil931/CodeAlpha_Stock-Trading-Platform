@@ -1,6 +1,7 @@
 package com.dhruvil.Stock.Trading.Platform.service;
 
 import com.dhruvil.Stock.Trading.Platform.dto.BuyStockRequestDto;
+import com.dhruvil.Stock.Trading.Platform.dto.PortfolioResponseDto;
 import com.dhruvil.Stock.Trading.Platform.entities.Portfolio;
 import com.dhruvil.Stock.Trading.Platform.entities.Stock;
 import com.dhruvil.Stock.Trading.Platform.entities.Transaction;
@@ -120,5 +121,26 @@ public class StockService {
         transactionRepository.save(transaction);
 
         return "Stock sold successfully";
+    }
+
+    public List<PortfolioResponseDto> getPortfolio(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Portfolio> portfolios = portfolioRepository.findByUser(user);
+
+        return portfolios.stream()
+                .map(p -> {
+                    BigDecimal totalValue = p.getStock().getPrice()
+                            .multiply(BigDecimal.valueOf(p.getQuantity()));
+
+                    return new PortfolioResponseDto(
+                            p.getStock().getSymbol(),
+                            p.getStock().getCompanyName(),
+                            p.getQuantity(),
+                            p.getStock().getPrice(),
+                            totalValue
+                    );
+                })
+                .toList();
     }
 }

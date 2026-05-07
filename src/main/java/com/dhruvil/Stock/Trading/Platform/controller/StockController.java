@@ -1,6 +1,7 @@
 package com.dhruvil.Stock.Trading.Platform.controller;
 
 import com.dhruvil.Stock.Trading.Platform.dto.BuyStockRequestDto;
+import com.dhruvil.Stock.Trading.Platform.dto.PortfolioResponseDto;
 import com.dhruvil.Stock.Trading.Platform.entities.Stock;
 import com.dhruvil.Stock.Trading.Platform.service.StockService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,10 @@ public class StockController {
         String result = stockService.sellStock(principal.getName(), buyStockRequestDto);
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/portfolio")
+    public ResponseEntity<List<PortfolioResponseDto>> viewPortfolio(Principal principal) {
+        return ResponseEntity.ok(stockService.getPortfolio(principal.getName()));
     }
 }
