@@ -35,9 +35,4 @@ public class StockController {
 
         return ResponseEntity.ok(result);
     }
-
-    @PostMapping("/portfolio")
-    public ResponseEntity<List<PortfolioResponseDto>> viewPortfolio(Principal principal) {
-        return ResponseEntity.ok(stockService.getPortfolio(principal.getName()));
-    }
 }
